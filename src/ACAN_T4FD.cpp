@@ -253,8 +253,11 @@ uint32_t ACAN_T4::beginFD (const ACAN_T4FD_Settings & inSettings,
       | FLEXCAN_FDCTRL_MBDSR0 (inSettings.mPayload)
     ;
     if (!inSettings.mLoopBackMode) {
+      // TDC offset = PropSeg + PS1, clamped to 5-bit field (max 31)
+      uint32_t tdco = inSettings.mDataPropagationSegment + inSettings.mDataPhaseSegment1 ;
+      if (tdco > 31) tdco = 31 ;
       v |= FLEXCAN_FDCTRL_TDCEN // Transceiver Delay Compensation Enable
-        | (8 << 8) // Transceiver Delay Compensation Offset
+        | (tdco << 8) // Transceiver Delay Compensation Offset
      ;
     }
     FLEXCAN_FDCTRL (mFlexcanBaseAddress) = v ;
@@ -291,7 +294,7 @@ uint32_t ACAN_T4::beginFD (const ACAN_T4FD_Settings & inSettings,
     ;
   //---------- CTRL2 (§44.6.2.14, page 2791)
     FLEXCAN_CTRL2 (mFlexcanBaseAddress) =
-      (0 << 19) | // TASD: 0x16 is the default value
+      (22 << 19) | // TASD: 0x16 = 22, required for CAN-FD BRS arbitration timing
       (1 << 17) | // RRS: Received remote request frame is stored
       (1 << 16) | // EACEN: RTR bit in mask is always compared
       (1 << 13) | // Bit Timing Expansion Enable
