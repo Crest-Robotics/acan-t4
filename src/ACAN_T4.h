@@ -96,6 +96,8 @@ enum class ACAN_T4_Module {CAN1, CAN2, CAN3} ;
 //--------------------------------------------------------------------------------------------------
 
 class ACAN_T4 {
+  public: static constexpr tControllerState kBusOff = ::kBusOff ;
+
 //--- Constructor
   private: ACAN_T4 (const uint32_t mFlexcanBaseAddress,
                     const ACAN_T4_Module inModule) ;
